@@ -1,0 +1,37 @@
+{
+  "name": "app-matrix-rain",
+  "version": "0.0.0",
+  "description": "Multilingual Matrix-style digital rain effect, animated with GSAP.",
+  "type": "module",
+  "main": "./dist/index.js",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "test": "vitest run"
+  },
+  "keywords": [
+    "matrix",
+    "rain",
+    "canvas",
+    "gsap",
+    "animation"
+  ],
+  "license": "MIT",
+  "author": "Hugo Kubiak",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/hugokubiak/app-matrix-rain.git",
+    "directory": "packages/core"
+  },
+  "peerDependencies": {
+    "gsap": "^3.12.0"
+  },
+  "devDependencies": {
+    "typescript": "^5.5.0",
+    "vitest": "^2.0.0"
+  }
+}

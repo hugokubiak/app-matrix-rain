@@ -1,0 +1,11 @@
+/* TODO: full-bleed layout for the canvas + discreet overlay panel styling. */
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  background: #000;
+  color: #eee;
+  font-family: monospace;
+}
