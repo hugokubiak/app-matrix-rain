@@ -1,0 +1,22 @@
+{
+  "name": "app-matrix-rain-monorepo",
+  "private": true,
+  "version": "0.0.0",
+  "description": "Monorepo for app-matrix-rain: a multilingual Matrix-style digital rain effect, packaged as a reusable library.",
+  "workspaces": [
+    "packages/*",
+    "demo"
+  ],
+  "scripts": {
+    "dev": "npm run dev --workspace=demo",
+    "build": "npm run build --workspaces --if-present",
+    "lint": "eslint .",
+    "test": "vitest run"
+  },
+  "license": "MIT",
+  "author": "Hugo Kubiak",
+  "devDependencies": {
+    "eslint": "^10.8.0",
+    "typescript-eslint": "^8.66.0"
+  }
+}

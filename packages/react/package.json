@@ -1,0 +1,30 @@
+{
+  "name": "app-matrix-rain-react",
+  "version": "0.0.0",
+  "description": "Optional React wrapper (<MatrixRain />) for app-matrix-rain.",
+  "type": "module",
+  "main": "./dist/index.js",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "tsc -p tsconfig.json"
+  },
+  "license": "MIT",
+  "author": "Hugo Kubiak",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/hugokubiak/app-matrix-rain.git",
+    "directory": "packages/react"
+  },
+  "peerDependencies": {
+    "react": "^18.0.0 || ^19.0.0",
+    "app-matrix-rain": "0.0.0"
+  },
+  "devDependencies": {
+    "@types/react": "^18.0.0",
+    "typescript": "^5.5.0"
+  }
+}
