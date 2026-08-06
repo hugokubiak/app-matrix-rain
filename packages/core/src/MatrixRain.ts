@@ -35,6 +35,13 @@ export class MatrixRain {
 
   start(): void {
     if (this.running) return;
+
+    if (this.config.respectReducedMotion && prefersReducedMotion()) {
+      const chars = CHARSETS[this.config.charset];
+      stepRain(this.ctx, this.state, chars, this.config, this.canvas.width, this.canvas.height);
+      return;
+    }
+
     this.running = true;
     gsap.ticker.add(this.onTick);
   }
@@ -76,4 +83,8 @@ export class MatrixRain {
     const chars = CHARSETS[this.config.charset];
     stepRain(this.ctx, this.state, chars, this.config, this.canvas.width, this.canvas.height);
   }
+}
+
+function prefersReducedMotion(): boolean {
+  return window.matchMedia?.('(prefers-reduced-motion: reduce)').matches ?? false;
 }
