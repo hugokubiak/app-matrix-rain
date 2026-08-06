@@ -1,2 +1,4 @@
-// TODO: cyrillic charset chars.
-export const cyrillic: string[] = [];
+const upper = 'АБВГДЕЁЖЗИЙКЛМНОПРСТУФХЦЧШЩЪЫЬЭЮЯ';
+const lower = 'абвгдеёжзийклмнопрстуфхцчшщъыьэюя';
+
+export const cyrillic: string[] = [...upper, ...lower];
