@@ -1,2 +1,4 @@
-// TODO: katakana charset chars.
-export const katakana: string[] = [];
+const chars =
+  'ァアィイゥウェエォオカガキギクグケゲコゴサザシジスズセゼソゾタダチヂッツヅテデトドナニヌネノハバパヒビピフブプヘベペホボポマミムメモャヤュユョヨラリルレロヮワヰヱヲンヴ';
+
+export const katakana: string[] = [...chars];

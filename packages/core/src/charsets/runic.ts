@@ -1,2 +1,3 @@
-// TODO: runic charset chars.
-export const runic: string[] = [];
+const chars = 'ᚠᚢᚦᚨᚱᚲᚷᚹᚺᚾᛁᛃᛇᛈᛉᛊᛏᛒᛖᛗᛚᛜᛞᛟ';
+
+export const runic: string[] = [...chars];
