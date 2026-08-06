@@ -1,2 +1,4 @@
-// TODO: arabic charset chars (RTL, see direction.ts).
-export const arabic: string[] = [];
+const letters = 'ابتثجحخدذرزسشصضطظعغفقكلمنهوي';
+const digits = '٠١٢٣٤٥٦٧٨٩';
+
+export const arabic: string[] = [...letters, ...digits];
