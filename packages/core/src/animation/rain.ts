@@ -32,8 +32,10 @@ export function stepRain(
 
   ctx.font = `${fontSize}px monospace`;
 
+  const rtl = config.direction === 'rtl';
+
   state.drops = state.drops.map((drop, i) => {
-    const x = i * fontSize;
+    const x = rtl ? width - (i + 1) * fontSize : i * fontSize;
     const y = drop * fontSize;
 
     ctx.fillStyle = `hsl(${hue}, 100%, 75%)`;
