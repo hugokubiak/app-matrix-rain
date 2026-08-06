@@ -3,6 +3,7 @@ import { resolveConfig, type MatrixRainConfig } from './config.js';
 import { CHARSETS } from './charsets/index.js';
 import { createRainState, stepRain, type RainState } from './animation/rain.js';
 import { decayGlitch, triggerGlitch, type GlitchState } from './animation/glitch.js';
+import { createScramble, renderScramble, stepScramble, type ScrambleState } from './animation/scramble.js';
 
 export class MatrixRain {
   private readonly container: HTMLElement;
@@ -13,6 +14,7 @@ export class MatrixRain {
   private running = false;
   private accumulatorMs = 0;
   private glitch: GlitchState | null = null;
+  private scramble: ScrambleState | null = null;
   private readonly onResize = (): void => this.resize();
   private readonly onTick = (_time: number, deltaTimeMs: number): void => this.tick(deltaTimeMs);
   private readonly onGlitchPointer = (event: MouseEvent): void => {
@@ -65,8 +67,8 @@ export class MatrixRain {
     this.syncGlitchListeners();
   }
 
-  scrambleText(_text: string): void {
-    throw new Error('Not implemented');
+  scrambleText(text: string): void {
+    this.scramble = createScramble(text);
   }
 
   destroy(): void {
@@ -103,6 +105,33 @@ export class MatrixRain {
 
     const chars = CHARSETS[this.config.charset];
     stepRain(this.ctx, this.state, chars, this.config, this.canvas.width, this.canvas.height, this.glitch);
+
+    if (this.scramble) {
+      this.scramble = stepScramble(this.scramble);
+      if (this.scramble) this.drawScramble(this.scramble, chars);
+    }
+  }
+
+  private drawScramble(scramble: ScrambleState, noiseChars: string[]): void {
+    const fontSize = (this.config.fontSize ?? 16) * 1.5;
+    const text = renderScramble(scramble, noiseChars);
+    const x = this.canvas.width / 2;
+    const y = this.canvas.height / 2;
+
+    this.ctx.font = `bold ${fontSize}px monospace`;
+    this.ctx.textAlign = 'center';
+    this.ctx.textBaseline = 'middle';
+
+    const padding = fontSize;
+    const textWidth = this.ctx.measureText(text).width;
+    this.ctx.fillStyle = 'rgba(0, 0, 0, 0.75)';
+    this.ctx.fillRect(x - textWidth / 2 - padding, y - fontSize, textWidth + padding * 2, fontSize * 2);
+
+    this.ctx.fillStyle = this.config.color ?? '#00ff41';
+    this.ctx.fillText(text, x, y);
+
+    this.ctx.textAlign = 'left';
+    this.ctx.textBaseline = 'alphabetic';
   }
 }
 
