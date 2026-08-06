@@ -21,7 +21,7 @@ Full API + how to add a charset: [`packages/core/README.md`](./packages/core/REA
 
 - [x] MVP: canvas + GSAP, latin charset, basic config
 - [x] Every other charset: katakana • cyrillic • thai • arabic • runic • binary • hex • code
-- [ ] RTL for arabic
+- [x] RTL for arabic
 - [ ] `prefers-reduced-motion` + sane contrast defaults
 - [ ] Glitch on hover/click
 - [ ] Text-scramble easter egg
