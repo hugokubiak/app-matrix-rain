@@ -1,4 +1,5 @@
 import type { MatrixRainConfig } from '../config.js';
+import { glitchInfluence, type GlitchState } from './glitch.js';
 
 const INITIAL_OFFSET_ROWS = 100;
 
@@ -20,6 +21,7 @@ export function stepRain(
   config: MatrixRainConfig,
   width: number,
   height: number,
+  glitch: GlitchState | null = null,
 ): void {
   const fontSize = config.fontSize ?? 16;
   const density = config.density ?? 1;
@@ -37,13 +39,15 @@ export function stepRain(
   state.drops = state.drops.map((drop, i) => {
     const x = rtl ? width - (i + 1) * fontSize : i * fontSize;
     const y = drop * fontSize;
+    const influence = glitchInfluence(glitch, x, y);
+    const jitter = influence > 0 ? (Math.random() - 0.5) * influence * fontSize : 0;
 
-    ctx.fillStyle = `hsl(${hue}, 100%, 75%)`;
-    ctx.fillText(chars[Math.floor(Math.random() * chars.length)] ?? '', x, y);
+    ctx.fillStyle = influence > 0.4 ? '#ffffff' : `hsl(${hue}, 100%, 75%)`;
+    ctx.fillText(chars[Math.floor(Math.random() * chars.length)] ?? '', x + jitter, y);
 
     if (Math.random() > 1 - 0.02 * density) {
-      ctx.fillStyle = `hsl(${hue}, 100%, 45%)`;
-      ctx.fillText(chars[Math.floor(Math.random() * chars.length)] ?? '', x, y - fontSize);
+      ctx.fillStyle = influence > 0.4 ? '#ffffff' : `hsl(${hue}, 100%, 45%)`;
+      ctx.fillText(chars[Math.floor(Math.random() * chars.length)] ?? '', x + jitter, y - fontSize);
     }
 
     if (y > height && Math.random() > 1 - 0.025 * density) {
