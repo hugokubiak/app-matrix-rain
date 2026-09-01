@@ -1,4 +1,5 @@
-import type { CharsetKey } from './charsets/index.js';
+import { CHARSETS, type CharsetKey } from './charsets/index.js';
+import { defaultDirectionFor } from './direction.js';
 
 export type Direction = 'ltr' | 'rtl';
 
@@ -23,12 +24,24 @@ export const DEFAULT_CONFIG = {
   color: '#00ff41',
   backgroundColor: '#000000',
   glitchOnHover: false,
-  fadeOpacity: 0.05,
+  fadeOpacity: 0.08,
   respectReducedMotion: true,
 } as const satisfies Omit<MatrixRainConfig, 'direction'>;
 
-// TODO: validate/normalize a Partial<MatrixRainConfig> against DEFAULT_CONFIG
-// (clamp numeric ranges, validate charset key, derive direction from charset).
-export function resolveConfig(_config?: Partial<MatrixRainConfig>): MatrixRainConfig {
-  throw new Error('Not implemented');
+export function resolveConfig(config: Partial<MatrixRainConfig> = {}): MatrixRainConfig {
+  const charset: CharsetKey = config.charset && config.charset in CHARSETS ? config.charset : DEFAULT_CONFIG.charset;
+
+  return {
+    ...DEFAULT_CONFIG,
+    ...config,
+    charset,
+    direction: config.direction ?? defaultDirectionFor(charset),
+    speed: clamp(config.speed ?? DEFAULT_CONFIG.speed, 0.1, 10),
+    density: clamp(config.density ?? DEFAULT_CONFIG.density, 0.1, 5),
+    fadeOpacity: clamp(config.fadeOpacity ?? DEFAULT_CONFIG.fadeOpacity, 0, 1),
+  };
+}
+
+function clamp(value: number, min: number, max: number): number {
+  return Math.min(Math.max(value, min), max);
 }

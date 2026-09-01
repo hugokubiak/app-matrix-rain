@@ -1,2 +1,6 @@
-// TODO: latin charset chars (MVP, implement first).
-export const latin: string[] = [];
+const upper = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+const lower = 'abcdefghijklmnopqrstuvwxyz';
+const digits = '0123456789';
+const symbols = '!@#$%^&*()-_=+[]{}<>/\\|;:,.?';
+
+export const latin: string[] = [...upper, ...lower, ...digits, ...symbols];

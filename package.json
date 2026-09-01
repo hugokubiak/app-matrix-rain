@@ -14,5 +14,9 @@
     "test": "vitest run"
   },
   "license": "MIT",
-  "author": "Hugo Kubiak"
+  "author": "Hugo Kubiak",
+  "devDependencies": {
+    "eslint": "^10.8.0",
+    "typescript-eslint": "^8.66.0"
+  }
 }
