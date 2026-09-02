@@ -17,6 +17,7 @@
   "author": "Hugo Kubiak",
   "devDependencies": {
     "eslint": "^10.8.0",
+    "jsdom": "^30.0.1",
     "typescript-eslint": "^8.66.0"
   }
 }

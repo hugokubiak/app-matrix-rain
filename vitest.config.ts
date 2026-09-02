@@ -1,11 +1,11 @@
 import { defineConfig } from 'vitest/config';
 
-// Unit tests for the pure logic in packages/core (config resolution, charset
-// registry, animation state helpers). No DOM: MatrixRain itself and the React
-// wrapper are not covered here.
+// Unit tests for packages/core (pure logic + the MatrixRain class) and
+// packages/react (the wrapper). Default env is node; DOM-dependent files opt in
+// with a `// @vitest-environment jsdom` docblock.
 export default defineConfig({
   test: {
     environment: 'node',
-    include: ['packages/*/src/**/*.test.ts'],
+    include: ['packages/*/src/**/*.test.{ts,tsx}'],
   },
 });
