@@ -2,7 +2,7 @@
 
 🎬 Matrix-style digital rain, built with GSAP, packaged as a proper npm library. Twist: the falling characters shift with the script you pick. Katakana • Cyrillic • Thai • Arabic (RTL) • runic • binary/hex • even scrolling source code.
 
-⚙️ Status: MVP + all charsets + RTL + reduced-motion + hover/click glitch + text-scramble + React wrapper + demo control panel done (canvas + GSAP, script switching wired). Roadmap below.
+⚙️ Status: MVP + all charsets + RTL + reduced-motion + hover/click glitch + text-scramble + React wrapper + demo control panel + CI/CD done (canvas + GSAP, script switching wired). Roadmap 1-9 complete, only the exploratory 3D variant left. Roadmap below.
 
 🔗 Live demo: TBD (GitHub Pages)
 📦 npm: TBD (not published)
@@ -27,7 +27,8 @@ Full API + how to add a charset: [`packages/core/README.md`](./packages/core/REA
 - [x] Text-scramble easter egg
 - [x] React wrapper
 - [x] Demo control panel
-- [ ] CI/CD
+- [x] CI/CD
+- [ ] Exploratory: scroll-driven 3D variant of the rain (not committed)
 
 ## Workflow
 
