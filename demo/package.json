@@ -6,7 +6,8 @@
   "scripts": {
     "dev": "vite",
     "build": "vite build",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "preview:e2e": "vite build --base=/ && vite preview --port 4173 --strictPort"
   },
   "dependencies": {
     "app-matrix-rain": "0.0.0",

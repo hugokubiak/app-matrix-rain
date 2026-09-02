@@ -11,11 +11,13 @@
     "dev": "npm run dev --workspace=demo",
     "build": "npm run build --workspaces --if-present",
     "lint": "eslint .",
-    "test": "vitest run"
+    "test": "vitest run",
+    "test:e2e": "playwright test"
   },
   "license": "MIT",
   "author": "Hugo Kubiak",
   "devDependencies": {
+    "@playwright/test": "^1.62.1",
     "eslint": "^10.8.0",
     "jsdom": "^30.0.1",
     "typescript-eslint": "^8.66.0"
