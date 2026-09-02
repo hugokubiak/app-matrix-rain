@@ -1,28 +1,28 @@
-<!-- Titre : type(scope): description, même convention que les commits (voir CLAUDE.md) -->
+<!-- Title: type(scope): description, same convention as commits (see CLAUDE.md) -->
 
-## Résumé
+## Summary
 
-<!-- 1 à 3 phrases : objectif de la PR -->
+<!-- 1 to 3 sentences: goal of the PR -->
 
-## Packages et fichiers
+## Packages and files
 
-<!-- packages/core, packages/react, demo : fichiers ajoutés, modifiés ou supprimés -->
+<!-- packages/core, packages/react, demo: files added, changed or removed -->
 
 ## API / Config
 
-<!-- Surface publique touchée : options de MatrixRainConfig, nouveaux charsets, exports index.ts -->
+<!-- Public surface touched: MatrixRainConfig options, new charsets, index.ts exports -->
 
 ## Animations
 
-<!-- GSAP : ticker, easing, nouveaux effets (glitch, scramble) -->
+<!-- GSAP: ticker, easing, new effects (glitch, scramble) -->
 
-## Accessibilité
+## Accessibility
 
-<!-- prefers-reduced-motion, contraste, RTL -->
+<!-- prefers-reduced-motion, contrast, RTL -->
 
 ## Performance
 
-<!-- FPS, taille du bundle npm, canvas vs DOM -->
+<!-- FPS, npm bundle size, canvas vs DOM -->
 
 ## Docs
 
@@ -30,8 +30,8 @@
 
 ## Test plan
 
-- [ ] `npm run build` passe (toutes les workspaces)
-- [ ] `npm run lint` passe
-- [ ] `npm run test` passe (vitest)
-- [ ] Vérification visuelle de la démo (`npm run dev`), desktop et mobile
-- [ ] Vérification manuelle des fonctionnalités impactées
+- [ ] `npm run build` passes (all workspaces)
+- [ ] `npm run lint` passes
+- [ ] `npm run test` passes (vitest)
+- [ ] Visual check of the demo (`npm run dev`), desktop and mobile
+- [ ] Manual check of the affected features
