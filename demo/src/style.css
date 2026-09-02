@@ -16,3 +16,107 @@ body {
   width: 100vw;
   height: 100vh;
 }
+
+.controls {
+  position: fixed;
+  top: 12px;
+  right: 12px;
+  z-index: 10;
+  width: 260px;
+  max-height: calc(100vh - 24px);
+  display: flex;
+  flex-direction: column;
+  background: rgba(0, 0, 0, 0.72);
+  border: 1px solid #00ff41;
+  font-size: 12px;
+  color: #d7ffe0;
+  backdrop-filter: blur(2px);
+}
+
+.controls__toggle {
+  padding: 8px 10px;
+  background: #00ff41;
+  color: #000;
+  border: 0;
+  font: inherit;
+  font-weight: bold;
+  text-align: left;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  cursor: pointer;
+}
+
+.controls__body {
+  padding: 10px;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 9px;
+}
+
+.controls__row {
+  display: grid;
+  grid-template-columns: 72px 1fr auto;
+  align-items: center;
+  gap: 8px;
+}
+
+.controls__row--checkbox {
+  grid-template-columns: 1fr auto;
+}
+
+.controls__row--scramble {
+  grid-template-columns: 72px 1fr auto;
+}
+
+.controls__label {
+  text-transform: lowercase;
+  opacity: 0.85;
+}
+
+.controls__value {
+  min-width: 30px;
+  text-align: right;
+  opacity: 0.7;
+}
+
+.controls select,
+.controls input[type='text'] {
+  width: 100%;
+  background: #000;
+  color: #d7ffe0;
+  border: 1px solid #1c6b34;
+  font: inherit;
+  padding: 3px 4px;
+}
+
+.controls input[type='range'] {
+  width: 100%;
+  accent-color: #00ff41;
+}
+
+.controls input[type='color'] {
+  width: 100%;
+  height: 22px;
+  padding: 0;
+  background: #000;
+  border: 1px solid #1c6b34;
+}
+
+.controls input[type='checkbox'] {
+  accent-color: #00ff41;
+}
+
+.controls__row--scramble button,
+.controls__toggle {
+  font: inherit;
+}
+
+.controls__row--scramble button {
+  padding: 3px 8px;
+  background: #00ff41;
+  color: #000;
+  border: 0;
+  font-weight: bold;
+  cursor: pointer;
+}
