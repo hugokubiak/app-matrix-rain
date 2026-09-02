@@ -7,15 +7,14 @@ if (!app) {
 }
 
 const initialState: ControlsState = {
-  charset: 'latin',
+  charset: 'katakana',
   directionMode: 'auto',
-  fontSize: 16,
-  speed: 1,
+  fontSize: 14,
+  speed: 0.8,
   density: 1,
   color: '#00ff41',
   backgroundColor: '#000000',
   glitchOnHover: false,
-  fadeOpacity: 0.08,
   respectReducedMotion: true,
 };
 
@@ -49,7 +48,6 @@ function toConfig(state: ControlsState): Partial<MatrixRainConfig> {
     color: state.color,
     backgroundColor: state.backgroundColor,
     glitchOnHover: state.glitchOnHover,
-    fadeOpacity: state.fadeOpacity,
     respectReducedMotion: state.respectReducedMotion,
   };
 }

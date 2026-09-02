@@ -1,12 +1,13 @@
 // @vitest-environment jsdom
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 
-const { tickerAdd, tickerRemove } = vi.hoisted(() => ({
+const { tickerAdd, tickerRemove, tickerFps } = vi.hoisted(() => ({
   tickerAdd: vi.fn(),
   tickerRemove: vi.fn(),
+  tickerFps: vi.fn(),
 }));
 vi.mock('gsap', () => ({
-  default: { ticker: { add: tickerAdd, remove: tickerRemove } },
+  default: { ticker: { add: tickerAdd, remove: tickerRemove, fps: tickerFps } },
 }));
 
 import { MatrixRain } from './MatrixRain.js';

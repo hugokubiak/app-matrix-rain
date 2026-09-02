@@ -16,7 +16,6 @@ interface MatrixRainConfig {
   color?: string;
   backgroundColor?: string;
   glitchOnHover?: boolean;
-  fadeOpacity?: number;
   respectReducedMotion?: boolean; // true by default
 }
 

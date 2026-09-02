@@ -28,7 +28,6 @@ export const MatrixRain = forwardRef<MatrixRainHandle, MatrixRainProps>(function
     color,
     backgroundColor,
     glitchOnHover,
-    fadeOpacity,
     respectReducedMotion,
   },
   ref,
@@ -45,7 +44,6 @@ export const MatrixRain = forwardRef<MatrixRainHandle, MatrixRainProps>(function
     color,
     backgroundColor,
     glitchOnHover,
-    fadeOpacity,
     respectReducedMotion,
   });
 
@@ -65,7 +63,7 @@ export const MatrixRain = forwardRef<MatrixRainHandle, MatrixRainProps>(function
 
   useEffect(() => {
     instanceRef.current?.updateConfig(config);
-  }, [charset, direction, fontSize, speed, density, color, backgroundColor, glitchOnHover, fadeOpacity, respectReducedMotion]);
+  }, [charset, direction, fontSize, speed, density, color, backgroundColor, glitchOnHover, respectReducedMotion]);
 
   useImperativeHandle(
     ref,

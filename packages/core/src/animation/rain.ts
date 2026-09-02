@@ -1,19 +1,103 @@
 import type { MatrixRainConfig } from '../config.js';
 import { glitchInfluence, type GlitchState } from './glitch.js';
 
-const INITIAL_OFFSET_ROWS = 100;
+// emilyxxie/green_rain (sketch.js) ported to gsap.ticker, then wired back to
+// MatrixRainConfig. Structure follows the original: 14px cell, fadeInterval 1.6,
+// speeds 5..22 px/frame, switchInterval 2..25, start offset -2000..0, the greens
+// rgba(140,255,170) / rgba(0,255,70). The ground is cleared opaque every frame,
+// so the trail is the stream's own head->tail opacity ramp, no ghosting.
+//
+// Config hooks: fontSize -> cell size (speeds and the start offset scale with
+// it), speed -> fall multiplier, density -> stream length, color -> the two
+// greens (head is the body colour lifted toward white), backgroundColor -> the
+// ground, direction -> RTL mirroring, charset -> glyph set.
+
+export const SYMBOL_SIZE = 14;
+const FADE_INTERVAL = 1.6;
+const REF_CELL = 14;
+const HEAD_LIFT = 140 / 255; // 0 -> 140, matching green_rain's rgba(140,255,170)
+
+interface RainSymbol {
+  x: number;
+  y: number;
+  glyph: number; // index into the active charset
+  speed: number; // px per frame before the config.speed multiplier
+  first: boolean;
+  opacity: number;
+  switchInterval: number;
+}
+
+interface RainStream {
+  symbols: RainSymbol[];
+  totalSymbols: number;
+  speed: number;
+}
 
 export interface RainState {
-  drops: number[];
+  streams: RainStream[];
+  frameCount: number;
 }
 
-export function createRainState(width: number, fontSize: number): RainState {
-  const columns = Math.max(1, Math.floor(width / fontSize));
-  return {
-    drops: Array.from({ length: columns }, () => Math.random() * -INITIAL_OFFSET_ROWS),
-  };
+function random(min: number, max: number): number {
+  return min + Math.random() * (max - min);
 }
 
+function randIndex(count: number): number {
+  return Math.floor(Math.random() * count);
+}
+
+function generateSymbols(stream: RainStream, x: number, startY: number, cell: number): void {
+  let opacity = 255;
+  let first = Math.round(random(0, 4)) === 1;
+  let y = startY;
+  for (let i = 0; i <= stream.totalSymbols; i += 1) {
+    stream.symbols.push({
+      x,
+      y,
+      glyph: 0,
+      speed: stream.speed,
+      first,
+      opacity,
+      switchInterval: Math.max(1, Math.round(random(2, 25))),
+    });
+    opacity -= 255 / stream.totalSymbols / FADE_INTERVAL;
+    y -= cell;
+    first = false;
+  }
+}
+
+export function createRainState(width: number, fontSize = SYMBOL_SIZE, density = 1): RainState {
+  const cell = fontSize;
+  const cellRatio = cell / REF_CELL;
+  const streams: RainStream[] = [];
+  let x = 0;
+  for (let i = 0; i <= width / cell; i += 1) {
+    const stream: RainStream = {
+      symbols: [],
+      totalSymbols: Math.max(1, Math.round(random(5, 35) * density)),
+      speed: random(5, 22) * cellRatio,
+    };
+    generateSymbols(stream, x, random(-2000, 0) * cellRatio, cell);
+    streams.push(stream);
+    x += cell;
+  }
+  return { streams, frameCount: 0 };
+}
+
+// The non-loop half of the original setup(): ground fill + font + baseline.
+export function primeCanvas(
+  ctx: CanvasRenderingContext2D,
+  width: number,
+  height: number,
+  config: MatrixRainConfig,
+): void {
+  ctx.fillStyle = config.backgroundColor ?? '#000000';
+  ctx.fillRect(0, 0, width, height);
+  ctx.font = `${config.fontSize ?? SYMBOL_SIZE}px Consolas, ui-monospace, monospace`;
+  ctx.textBaseline = 'alphabetic';
+}
+
+// The original draw().
 export function stepRain(
   ctx: CanvasRenderingContext2D,
   state: RainState,
@@ -23,59 +107,51 @@ export function stepRain(
   height: number,
   glitch: GlitchState | null = null,
 ): void {
-  const fontSize = config.fontSize ?? 16;
-  const density = config.density ?? 1;
-  const hue = hueOf(config.color ?? '#00ff41');
+  const cell = config.fontSize ?? SYMBOL_SIZE;
+  const speedMul = config.speed ?? 1;
+  const rtl = config.direction === 'rtl';
+  const glyphCount = Math.max(1, chars.length);
+  const [br, bg, bb] = channels(config.color ?? '#00ff41');
+  const [hr, hg, hb] = lift(br, bg, bb);
 
-  ctx.globalAlpha = config.fadeOpacity ?? 0.08;
   ctx.fillStyle = config.backgroundColor ?? '#000000';
   ctx.fillRect(0, 0, width, height);
-  ctx.globalAlpha = 1;
+  ctx.font = `${cell}px Consolas, ui-monospace, monospace`;
 
-  ctx.font = `${fontSize}px monospace`;
+  for (const stream of state.streams) {
+    for (const symbol of stream.symbols) {
+      const alpha = Math.max(symbol.opacity, 0) / 255;
+      const drawX = rtl ? width - cell - symbol.x : symbol.x;
+      const influence = glitchInfluence(glitch, drawX, symbol.y);
+      const jitter = influence > 0 ? (Math.random() - 0.5) * influence * cell : 0;
 
-  const rtl = config.direction === 'rtl';
+      if (influence > 0.4) {
+        ctx.fillStyle = `rgba(255, 255, 255, ${alpha})`;
+      } else if (symbol.first) {
+        ctx.fillStyle = `rgba(${hr}, ${hg}, ${hb}, ${alpha})`;
+      } else {
+        ctx.fillStyle = `rgba(${br}, ${bg}, ${bb}, ${alpha})`;
+      }
 
-  state.drops = state.drops.map((drop, i) => {
-    const x = rtl ? width - (i + 1) * fontSize : i * fontSize;
-    const y = drop * fontSize;
-    const influence = glitchInfluence(glitch, x, y);
-    const jitter = influence > 0 ? (Math.random() - 0.5) * influence * fontSize : 0;
+      ctx.fillText(chars[symbol.glyph] ?? '', drawX + jitter, symbol.y);
 
-    ctx.fillStyle = influence > 0.4 ? '#ffffff' : `hsl(${hue}, 100%, 75%)`;
-    ctx.fillText(chars[Math.floor(Math.random() * chars.length)] ?? '', x + jitter, y);
-
-    if (Math.random() > 1 - 0.02 * density) {
-      ctx.fillStyle = influence > 0.4 ? '#ffffff' : `hsl(${hue}, 100%, 45%)`;
-      ctx.fillText(chars[Math.floor(Math.random() * chars.length)] ?? '', x + jitter, y - fontSize);
+      symbol.y = symbol.y >= height ? 0 : symbol.y + symbol.speed * speedMul;
+      if (state.frameCount % symbol.switchInterval === 0) {
+        symbol.glyph = randIndex(glyphCount);
+      }
     }
+  }
 
-    if (y > height && Math.random() > 1 - 0.025 * density) {
-      return 0;
-    }
-    return drop + 1;
-  });
+  state.frameCount += 1;
 }
 
-function hueOf(color: string): number {
-  const match = /^#([0-9a-f]{6})$/i.exec(color);
-  const hex = match?.[1];
-  if (!hex) return 120;
+function channels(hex: string): [number, number, number] {
+  const match = /^#([0-9a-f]{2})([0-9a-f]{2})([0-9a-f]{2})$/i.exec(hex);
+  if (!match) return [0, 255, 70]; // green_rain's body green
+  return [parseInt(match[1] ?? '00', 16), parseInt(match[2] ?? 'ff', 16), parseInt(match[3] ?? '46', 16)];
+}
 
-  const r = parseInt(hex.slice(0, 2), 16) / 255;
-  const g = parseInt(hex.slice(2, 4), 16) / 255;
-  const b = parseInt(hex.slice(4, 6), 16) / 255;
-  const max = Math.max(r, g, b);
-  const min = Math.min(r, g, b);
-  const delta = max - min;
-
-  if (delta === 0) return 120;
-
-  let hue: number;
-  if (max === r) hue = ((g - b) / delta) % 6;
-  else if (max === g) hue = (b - r) / delta + 2;
-  else hue = (r - g) / delta + 4;
-
-  hue *= 60;
-  return hue < 0 ? hue + 360 : hue;
+function lift(r: number, g: number, b: number): [number, number, number] {
+  const up = (c: number): number => Math.round(c + (255 - c) * HEAD_LIFT);
+  return [up(r), up(g), up(b)];
 }
