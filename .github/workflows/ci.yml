@@ -17,6 +17,5 @@ jobs:
           cache: npm
       - run: npm ci
       - run: npm run lint
+      - run: npm run test
       - run: npm run build
-      # npm run test is intentionally skipped: no spec files yet, vitest exits 1
-      # on "No test files found". Add it here once packages have tests.
