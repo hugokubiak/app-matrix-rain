@@ -21,7 +21,7 @@ export class MatrixRain {
     clearTimeout(this.resizeTimer);
     this.resizeTimer = setTimeout(() => {
       this.resize();
-      primeCanvas(this.ctx, this.canvas.width, this.canvas.height);
+      primeCanvas(this.ctx, this.canvas.width, this.canvas.height, this.config);
       this.seedState();
     }, 200);
   };
@@ -45,7 +45,7 @@ export class MatrixRain {
     this.ctx = ctx;
 
     this.resize();
-    primeCanvas(this.ctx, this.canvas.width, this.canvas.height);
+    primeCanvas(this.ctx, this.canvas.width, this.canvas.height, this.config);
     this.seedState();
 
     window.addEventListener('resize', this.onResize);
@@ -56,7 +56,8 @@ export class MatrixRain {
     if (this.running) return;
 
     if (this.config.respectReducedMotion && prefersReducedMotion()) {
-      stepRain(this.ctx, this.state, this.canvas.width, this.canvas.height);
+      const chars = CHARSETS[this.config.charset];
+      stepRain(this.ctx, this.state, chars, this.config, this.canvas.width, this.canvas.height);
       return;
     }
 
@@ -73,6 +74,7 @@ export class MatrixRain {
 
   updateConfig(config: Partial<MatrixRainConfig>): void {
     this.config = resolveConfig({ ...this.config, ...config });
+    primeCanvas(this.ctx, this.canvas.width, this.canvas.height, this.config);
     this.seedState();
     this.syncGlitchListeners();
   }
@@ -96,7 +98,7 @@ export class MatrixRain {
   }
 
   private seedState(): void {
-    this.state = createRainState(this.canvas.width);
+    this.state = createRainState(this.canvas.width, this.config.fontSize, this.config.density);
   }
 
   private syncGlitchListeners(): void {
@@ -110,7 +112,15 @@ export class MatrixRain {
 
   private tick(deltaTimeMs: number): void {
     this.glitch = decayGlitch(this.glitch);
-    stepRain(this.ctx, this.state, this.canvas.width, this.canvas.height, this.glitch);
+    stepRain(
+      this.ctx,
+      this.state,
+      CHARSETS[this.config.charset],
+      this.config,
+      this.canvas.width,
+      this.canvas.height,
+      this.glitch,
+    );
 
     // Scramble easter egg keeps its own ~25/s cadence; redrawn every frame so the
     // rain's veil does not eat it.
@@ -124,7 +134,7 @@ export class MatrixRain {
   }
 
   private drawScramble(scramble: ScrambleState, noiseChars: string[]): void {
-    const fontSize = SYMBOL_SIZE * 1.5;
+    const fontSize = (this.config.fontSize ?? SYMBOL_SIZE) * 1.5;
     const text = renderScramble(scramble, noiseChars);
     const x = this.canvas.width / 2;
     const y = this.canvas.height / 2;

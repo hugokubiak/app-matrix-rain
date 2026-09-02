@@ -1,5 +1,5 @@
 // Live control panel for the demo: charset select, direction, font size, speed,
-// density, colors, glitch toggle, fade, reduced-motion toggle, scramble text field.
+// density, colors, glitch toggle, reduced-motion toggle, scramble text field.
 // Vanilla DOM, no framework. Emits the full panel state on every change; the caller
 // maps it to a MatrixRainConfig patch.
 import type { CharsetKey } from 'app-matrix-rain';
@@ -15,7 +15,6 @@ export interface ControlsState {
   color: string;
   backgroundColor: string;
   glitchOnHover: boolean;
-  fadeOpacity: number;
   respectReducedMotion: boolean;
 }
 
@@ -87,11 +86,6 @@ export function createControls(options: CreateControlsOptions): ControlsHandle {
     emit();
   });
 
-  const fadeOpacity = rangeField('fade', { min: 0, max: 1, step: 0.01 }, state.fadeOpacity, (value) => {
-    state.fadeOpacity = value;
-    emit();
-  });
-
   const color = colorField('color', state.color, (value) => {
     state.color = value;
     emit();
@@ -118,7 +112,6 @@ export function createControls(options: CreateControlsOptions): ControlsHandle {
     fontSize,
     speed,
     density,
-    fadeOpacity,
     color,
     backgroundColor,
     glitch,

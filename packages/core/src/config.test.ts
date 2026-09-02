@@ -34,11 +34,6 @@ describe('resolveConfig', () => {
     expect(resolveConfig({ density: 42 }).density).toBe(5);
   });
 
-  it('clamps fadeOpacity to [0, 1]', () => {
-    expect(resolveConfig({ fadeOpacity: -1 }).fadeOpacity).toBe(0);
-    expect(resolveConfig({ fadeOpacity: 2 }).fadeOpacity).toBe(1);
-  });
-
   it('passes through custom values inside the allowed range', () => {
     const cfg = resolveConfig({ speed: 2.5, density: 3, color: '#ff0000', fontSize: 24 });
     expect(cfg.speed).toBe(2.5);

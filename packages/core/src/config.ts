@@ -12,19 +12,17 @@ export interface MatrixRainConfig {
   color?: string;
   backgroundColor?: string;
   glitchOnHover?: boolean;
-  fadeOpacity?: number;
   respectReducedMotion?: boolean;
 }
 
 export const DEFAULT_CONFIG = {
   charset: 'latin',
-  fontSize: 16,
-  speed: 1,
+  fontSize: 14, // green_rain's symbolSize
+  speed: 0.8,
   density: 1,
   color: '#00ff41',
   backgroundColor: '#000000',
   glitchOnHover: false,
-  fadeOpacity: 0.08,
   respectReducedMotion: true,
 } as const satisfies Omit<MatrixRainConfig, 'direction'>;
 
@@ -38,7 +36,6 @@ export function resolveConfig(config: Partial<MatrixRainConfig> = {}): MatrixRai
     direction: config.direction ?? defaultDirectionFor(charset),
     speed: clamp(config.speed ?? DEFAULT_CONFIG.speed, 0.1, 10),
     density: clamp(config.density ?? DEFAULT_CONFIG.density, 0.1, 5),
-    fadeOpacity: clamp(config.fadeOpacity ?? DEFAULT_CONFIG.fadeOpacity, 0, 1),
   };
 }
 
