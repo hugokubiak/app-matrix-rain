@@ -4,7 +4,7 @@
 
 ⚙️ Status: MVP + all charsets + RTL + reduced-motion + hover/click glitch + text-scramble + React wrapper + demo control panel + CI/CD done (canvas + GSAP, script switching wired). Roadmap 1-9 complete, only the exploratory 3D variant left. Roadmap below.
 
-🔗 Live demo: TBD (GitHub Pages)
+🔗 Live demo: https://hugokubiak.github.io/app-matrix-rain/
 📦 npm: TBD (not published)
 
 ## Structure
