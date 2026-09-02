@@ -1,81 +1,130 @@
-import type { MatrixRainConfig } from '../config.js';
 import { glitchInfluence, type GlitchState } from './glitch.js';
 
-const INITIAL_OFFSET_ROWS = 100;
+// Verbatim port of emilyxxie/green_rain sketch.js (Coding Train "Green Rain"),
+// driven by gsap.ticker instead of the p5 draw loop. Everything is fixed to the
+// original: 14px cell, katakana + digit glyphs, rgba(140,255,170) / rgba(0,255,70)
+// greens, the 0.588 black veil, fadeInterval 1.6, speeds 5..22, switchInterval
+// 2..25, start offset -2000..0. MatrixRainConfig (charset, color, fontSize,
+// density, direction, fadeOpacity, backgroundColor) does NOT affect this
+// renderer. The only addition is an optional glitch overlay, fully inert unless a
+// GlitchState is passed in.
+
+export const SYMBOL_SIZE = 14;
+const FADE_INTERVAL = 1.6;
+
+interface RainSymbol {
+  x: number;
+  y: number;
+  value: string | number;
+  speed: number;
+  first: boolean;
+  opacity: number;
+  switchInterval: number;
+}
+
+interface RainStream {
+  symbols: RainSymbol[];
+  totalSymbols: number;
+  speed: number;
+}
 
 export interface RainState {
-  drops: number[];
+  streams: RainStream[];
+  frameCount: number;
 }
 
-export function createRainState(width: number, fontSize: number): RainState {
-  const columns = Math.max(1, Math.floor(width / fontSize));
-  return {
-    drops: Array.from({ length: columns }, () => Math.random() * -INITIAL_OFFSET_ROWS),
-  };
+function random(min: number, max: number): number {
+  return min + Math.random() * (max - min);
 }
 
+function setToRandomSymbol(symbol: RainSymbol, frameCount: number): void {
+  const charType = Math.round(random(0, 5));
+  if (frameCount % symbol.switchInterval === 0) {
+    if (charType > 1) {
+      symbol.value = String.fromCharCode(0x30a0 + Math.floor(random(0, 97)));
+    } else {
+      symbol.value = Math.floor(random(0, 10));
+    }
+  }
+}
+
+function generateSymbols(stream: RainStream, x: number, startY: number, frameCount: number): void {
+  let opacity = 255;
+  let first = Math.round(random(0, 4)) === 1;
+  let y = startY;
+  for (let i = 0; i <= stream.totalSymbols; i += 1) {
+    const symbol: RainSymbol = {
+      x,
+      y,
+      value: '',
+      speed: stream.speed,
+      first,
+      opacity,
+      switchInterval: Math.round(random(2, 25)),
+    };
+    setToRandomSymbol(symbol, frameCount);
+    stream.symbols.push(symbol);
+    opacity -= 255 / stream.totalSymbols / FADE_INTERVAL;
+    y -= SYMBOL_SIZE;
+    first = false;
+  }
+}
+
+export function createRainState(width: number): RainState {
+  const streams: RainStream[] = [];
+  let x = 0;
+  for (let i = 0; i <= width / SYMBOL_SIZE; i += 1) {
+    const stream: RainStream = {
+      symbols: [],
+      totalSymbols: Math.round(random(5, 35)),
+      speed: random(5, 22),
+    };
+    generateSymbols(stream, x, random(-2000, 0), 0);
+    streams.push(stream);
+    x += SYMBOL_SIZE;
+  }
+  return { streams, frameCount: 0 };
+}
+
+// The non-loop half of the original setup(): black fill + font + baseline.
+export function primeCanvas(ctx: CanvasRenderingContext2D, width: number, height: number): void {
+  ctx.fillStyle = 'black';
+  ctx.fillRect(0, 0, width, height);
+  ctx.font = `${SYMBOL_SIZE}px Consolas, monospace`;
+  ctx.textBaseline = 'alphabetic';
+}
+
+// The original draw().
 export function stepRain(
   ctx: CanvasRenderingContext2D,
   state: RainState,
-  chars: string[],
-  config: MatrixRainConfig,
   width: number,
   height: number,
   glitch: GlitchState | null = null,
 ): void {
-  const fontSize = config.fontSize ?? 16;
-  const density = config.density ?? 1;
-  const hue = hueOf(config.color ?? '#00ff41');
-
-  ctx.globalAlpha = config.fadeOpacity ?? 0.08;
-  ctx.fillStyle = config.backgroundColor ?? '#000000';
+  ctx.fillStyle = 'rgba(0, 0, 0, 0.588)';
   ctx.fillRect(0, 0, width, height);
-  ctx.globalAlpha = 1;
 
-  ctx.font = `${fontSize}px monospace`;
+  for (const stream of state.streams) {
+    for (const symbol of stream.symbols) {
+      const alpha = Math.max(symbol.opacity, 0) / 255;
+      const influence = glitchInfluence(glitch, symbol.x, symbol.y);
+      const jitter = influence > 0 ? (Math.random() - 0.5) * influence * SYMBOL_SIZE : 0;
 
-  const rtl = config.direction === 'rtl';
+      if (influence > 0.4) {
+        ctx.fillStyle = `rgba(255, 255, 255, ${alpha})`;
+      } else if (symbol.first) {
+        ctx.fillStyle = `rgba(140, 255, 170, ${alpha})`;
+      } else {
+        ctx.fillStyle = `rgba(0, 255, 70, ${alpha})`;
+      }
 
-  state.drops = state.drops.map((drop, i) => {
-    const x = rtl ? width - (i + 1) * fontSize : i * fontSize;
-    const y = drop * fontSize;
-    const influence = glitchInfluence(glitch, x, y);
-    const jitter = influence > 0 ? (Math.random() - 0.5) * influence * fontSize : 0;
+      ctx.fillText(String(symbol.value), symbol.x + jitter, symbol.y);
 
-    ctx.fillStyle = influence > 0.4 ? '#ffffff' : `hsl(${hue}, 100%, 75%)`;
-    ctx.fillText(chars[Math.floor(Math.random() * chars.length)] ?? '', x + jitter, y);
-
-    if (Math.random() > 1 - 0.02 * density) {
-      ctx.fillStyle = influence > 0.4 ? '#ffffff' : `hsl(${hue}, 100%, 45%)`;
-      ctx.fillText(chars[Math.floor(Math.random() * chars.length)] ?? '', x + jitter, y - fontSize);
+      symbol.y = symbol.y >= height ? 0 : symbol.y + symbol.speed;
+      setToRandomSymbol(symbol, state.frameCount);
     }
+  }
 
-    if (y > height && Math.random() > 1 - 0.025 * density) {
-      return 0;
-    }
-    return drop + 1;
-  });
-}
-
-function hueOf(color: string): number {
-  const match = /^#([0-9a-f]{6})$/i.exec(color);
-  const hex = match?.[1];
-  if (!hex) return 120;
-
-  const r = parseInt(hex.slice(0, 2), 16) / 255;
-  const g = parseInt(hex.slice(2, 4), 16) / 255;
-  const b = parseInt(hex.slice(4, 6), 16) / 255;
-  const max = Math.max(r, g, b);
-  const min = Math.min(r, g, b);
-  const delta = max - min;
-
-  if (delta === 0) return 120;
-
-  let hue: number;
-  if (max === r) hue = ((g - b) / delta) % 6;
-  else if (max === g) hue = (b - r) / delta + 2;
-  else hue = (r - g) / delta + 4;
-
-  hue *= 60;
-  return hue < 0 ? hue + 360 : hue;
+  state.frameCount += 1;
 }
