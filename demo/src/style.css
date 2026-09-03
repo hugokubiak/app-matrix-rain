@@ -14,7 +14,14 @@ body {
 
 #app {
   width: 100vw;
+  /* iOS Safari: 100vh is the retracted-URL-bar height, so the canvas would run
+     under the address bar. dvh tracks the visible viewport; vh stays as fallback. */
   height: 100vh;
+  height: 100dvh;
+}
+
+#app canvas {
+  display: block;
 }
 
 .controls {
@@ -23,7 +30,7 @@ body {
   right: 12px;
   z-index: 10;
   width: 260px;
-  max-height: calc(100vh - 24px);
+  max-height: calc(100dvh - 24px);
   display: flex;
   flex-direction: column;
   background: rgba(0, 0, 0, 0.72);
