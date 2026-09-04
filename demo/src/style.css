@@ -5,32 +5,41 @@
 html,
 body {
   margin: 0;
+  width: 100%;
   height: 100%;
+  min-height: 100%;
   background: #000;
   color: #eee;
   font-family: monospace;
   overflow: hidden;
 }
 
+/* Fixed + inset:0 lets the canvas extend behind the notch/Dynamic Island and
+   the home-indicator area on iOS Safari; 100dvh would shrink it back to the
+   visible-chrome viewport and leave those zones black. Safe areas are applied
+   to .controls instead, not to this decorative background. */
 #app {
-  width: 100vw;
-  /* iOS Safari: 100vh is the retracted-URL-bar height, so the canvas would run
-     under the address bar. dvh tracks the visible viewport; vh stays as fallback. */
-  height: 100vh;
-  height: 100dvh;
+  position: fixed;
+  inset: 0;
+  width: 100%;
+  height: 100%;
 }
 
 #app canvas {
   display: block;
+  width: 100%;
+  height: 100%;
 }
 
 .controls {
   position: fixed;
-  top: 12px;
-  right: 12px;
+  top: calc(12px + env(safe-area-inset-top));
+  right: calc(12px + env(safe-area-inset-right));
   z-index: 10;
   width: 260px;
-  max-height: calc(100dvh - 24px);
+  max-height: calc(
+    100dvh - 24px - env(safe-area-inset-top) - env(safe-area-inset-bottom)
+  );
   display: flex;
   flex-direction: column;
   background: rgba(0, 0, 0, 0.72);
